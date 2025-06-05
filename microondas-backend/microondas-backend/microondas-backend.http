@@ -1,0 +1,6 @@
+@microondas_backend_HostAddress = http://localhost:5186
+
+GET {{microondas_backend_HostAddress}}/microondas/
+Accept: application/json
+
+###
