@@ -1,6 +1,32 @@
 [
   {
     "ContainingType": "microondas_backend.Controllers.MicroondasController",
+    "Method": "AdicionarProgramaCustomizado",
+    "RelativePath": "api/Microondas/adicionar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "programa",
+        "Type": "microondas_backend.Models.ProgramaAquecimento",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "microondas_backend.Models.ProgramaAquecimento",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "microondas_backend.Controllers.MicroondasController",
     "Method": "IniciarAquecimento",
     "RelativePath": "api/Microondas/iniciar",
     "HttpMethod": "POST",

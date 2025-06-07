@@ -1,4 +1,5 @@
 ﻿using microondas_backend.Data;
+using microondas_backend.Exceptions;
 using microondas_backend.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
@@ -38,6 +39,11 @@ namespace microondas_backend.Services
 
         public void AdicionarProgramaCustomizado(ProgramaAquecimento programa)
         {
+            var programas = _context.ProgramasAquecimento.ToList();
+            foreach (ProgramaAquecimento p in programas)
+                if (p.CaractereAquecimento == programa.CaractereAquecimento ||
+                    programa.CaractereAquecimento == ".")
+                    throw new MicroondasException("Caracter já cadastrado");
             _context.ProgramasAquecimento.Add(programa);
             _context.SaveChanges();
         }
