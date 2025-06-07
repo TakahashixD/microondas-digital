@@ -1,11 +1,15 @@
+using microondas_backend.Data;
 using microondas_backend.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddSingleton<MicroondasService>();
+builder.Services.AddScoped<MicroondasService>();
 
 builder.Services.AddCors(options =>
 {
@@ -17,9 +21,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 app.UseCors("AllowAngular");
 
 app.UseHttpsRedirection();

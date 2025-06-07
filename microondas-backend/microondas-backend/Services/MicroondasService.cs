@@ -1,16 +1,19 @@
-﻿using microondas_backend.Models;
+﻿using microondas_backend.Data;
+using microondas_backend.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace microondas_backend.Services
 {
     public class MicroondasService
     {
+        private readonly DataContext _context;
+
         private static bool _emAndamento = false;
         private static bool _pausado = false;
         private static int _tempoRestante = 0;
         private static int _potencia = 0;
-        private static DateTime _inicioAquecimento;
-        private static DateTime _pausaInicio;
         private static int _tempoTotalOriginal = 0;
         private static Timer? _timer;
         private static string _stringProcessamento = "";
@@ -18,68 +21,25 @@ namespace microondas_backend.Services
         private static ProgramaAquecimento? _programaAtual = null;
         private static string _caractereAquecimento = ".";
 
-        private static readonly List<ProgramaAquecimento> _programasPreDefinidos = new()
+        public MicroondasService(DataContext context)
         {
-            new ProgramaAquecimento
-            {
-                Id = 1,
-                Nome = "Pipoca",
-                Alimento = "Pipoca (de micro-ondas)",
-                Tempo = 180, // 3 minutos
-                Potencia = 7,
-                CaractereAquecimento = "*",
-                Instrucoes = "Observar o barulho de estouros do milho, caso houver um intervalo de mais de 10 segundos entre um estouro e outro, interrompa o aquecimento."
-            },
-            new ProgramaAquecimento
-            {
-                Id = 2,
-                Nome = "Leite",
-                Alimento = "Leite",
-                Tempo = 300, // 5 minutos
-                Potencia = 5,
-                CaractereAquecimento = "~",
-                Instrucoes = "Cuidado com aquecimento de líquidos, o choque térmico aliado ao movimento do recipiente pode causar fervura imediata causando risco de queimaduras."
-            },
-            new ProgramaAquecimento
-            {
-                Id = 3,
-                Nome = "Carnes de boi",
-                Alimento = "Carne em pedaço ou fatias",
-                Tempo = 840, // 14 minutos
-                Potencia = 4,
-                CaractereAquecimento = "#",
-                Instrucoes = "Interrompa o processo na metade e vire o conteúdo com a parte de baixo para cima para o descongelamento uniforme."
-            },
-            new ProgramaAquecimento
-            {
-                Id = 4,
-                Nome = "Frango",
-                Alimento = "Frango (qualquer corte)",
-                Tempo = 480, // 8 minutos
-                Potencia = 7,
-                CaractereAquecimento = "+",
-                Instrucoes = "Interrompa o processo na metade e vire o conteúdo com a parte de baixo para cima para o descongelamento uniforme."
-            },
-            new ProgramaAquecimento
-            {
-                Id = 5,
-                Nome = "Feijão",
-                Alimento = "Feijão congelado",
-                Tempo = 480, // 8 minutos
-                Potencia = 9,
-                CaractereAquecimento = "@",
-                Instrucoes = "Deixe o recipiente destampado e em casos de plástico, cuidado ao retirar o recipiente pois o mesmo pode perder resistência em altas temperaturas."
-            }
-        };
+            _context = context;
+        }
 
         public List<ProgramaAquecimento> ObterProgramasPreDefinidos()
         {
-            return _programasPreDefinidos.ToList();
+            return _context.ProgramasAquecimento.ToList();
         }
 
         public ProgramaAquecimento? ObterProgramaPorId(int id)
         {
-            return _programasPreDefinidos.FirstOrDefault(p => p.Id == id);
+            return _context.ProgramasAquecimento.FirstOrDefault(p => p.Id == id);
+        }
+
+        public void AdicionarProgramaCustomizado(ProgramaAquecimento programa)
+        {
+            _context.ProgramasAquecimento.Add(programa);
+            _context.SaveChanges();
         }
 
         public MicroondasResponse IniciarAquecimento(MicroondasRequest request)
@@ -130,7 +90,6 @@ namespace microondas_backend.Services
                 _caractereAquecimento = programa.CaractereAquecimento;
                 _emAndamento = true;
                 _pausado = false;
-                _inicioAquecimento = DateTime.Now;
                 _stringProcessamento = "";
 
                 IniciarTimer();
@@ -211,7 +170,6 @@ namespace microondas_backend.Services
             _potencia = potencia;
             _emAndamento = true;
             _pausado = false;
-            _inicioAquecimento = DateTime.Now;
             _stringProcessamento = "";
 
             IniciarTimer();
@@ -244,7 +202,6 @@ namespace microondas_backend.Services
             {
                 _pausado = true;
                 _emAndamento = false;
-                _pausaInicio = DateTime.Now;
                 _timer?.Dispose();
 
                 response.Sucesso = true;

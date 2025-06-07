@@ -1,6 +1,32 @@
-@microondas_backend_HostAddress = http://localhost:5186
+@microondas-backend_HostAddress = https://localhost:7000
 
-GET {{microondas_backend_HostAddress}}/microondas/
-Accept: application/json
+GET {{microondas-backend_HostAddress}}/api/microondas/status
 
 ###
+
+@id=1
+GET {{microondas-backend_HostAddress}}/api/microondas/programas/{{id}}
+
+###
+
+GET {{microondas-backend_HostAddress}}/api/microondas/programas
+
+###
+
+POST {{microondas-backend_HostAddress}}/api/microondas/pausar-cancelar
+
+###
+
+POST {{microondas-backend_HostAddress}}/api/microondas/inicio-rapido
+
+###
+
+POST {{microondas-backend_HostAddress}}/api/microondas/iniciar
+Content-Type: application/json
+
+{
+  //MicroondasRequest
+}
+
+###
+

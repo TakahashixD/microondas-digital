@@ -11,10 +11,11 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("f1a691c9-f96d-4873-92ed-4480e4500e09")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("microondas-backend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+18cf0ff66c422ddf2a7c3ebe2719962b7f6e2053")]
 [assembly: System.Reflection.AssemblyProductAttribute("microondas-backend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("microondas-backend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

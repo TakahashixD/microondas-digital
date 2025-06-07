@@ -46,6 +46,24 @@ namespace microondas_backend.Controllers
             }
         }
 
+        [HttpPost("adicionar")]
+        public ActionResult<ProgramaAquecimento> AdicionarProgramaCustomizado(ProgramaAquecimento programa)
+        {
+            try
+            {
+                if (programa == null)
+                    return Forbid("Não é possível adicionar null.");
+
+               _microondasService.AdicionarProgramaCustomizado(programa);
+
+                return Ok(programa);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Erro = ex.Message });
+            }
+        }
+
         [HttpPost("iniciar")]
         public ActionResult<MicroondasResponse> IniciarAquecimento([FromBody] MicroondasRequest request)
         {
@@ -92,7 +110,7 @@ namespace microondas_backend.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Erro = ex.Message });
+                return BadRequest(new { Erro = $"Erro em obter status atual do microondas: {ex.Message}" });
             }
         }
 
