@@ -1,4 +1,5 @@
-﻿using microondas_backend.Models;
+﻿using microondas_backend.Configs;
+using microondas_backend.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace microondas_backend.Data
@@ -7,15 +8,26 @@ namespace microondas_backend.Data
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
-            
         }
 
         public DbSet<ProgramaAquecimento> ProgramasAquecimento { get; set; }
-
+        public DbSet<Usuario> Usuarios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configurações Fluent API
+            modelBuilder.Entity<Usuario>(entity =>
+            {
+                entity.HasIndex(e => e.Nome).IsUnique();
+            });
+
+            modelBuilder.Entity<Usuario>().HasData(
+            new Usuario
+            {
+                Id= 1,
+                Nome = "admin",
+                Senha = CryptoService.HashSenha("admin")
+            });
+
             modelBuilder.Entity<ProgramaAquecimento>(entity =>
             {
                 entity.HasIndex(e => e.Nome).IsUnique();

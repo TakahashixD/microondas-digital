@@ -1,4 +1,4 @@
-﻿namespace microondas_backend.Models
+﻿namespace microondas_backend.DTOs
 {
     public class MicroondasRequest
     {

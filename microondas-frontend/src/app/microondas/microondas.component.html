@@ -68,8 +68,8 @@
       <h3>Programas Pré-definidos</h3>
       <div class="programs-grid">
         @for (programa of listProgramas; track programa.id) {
-        <div class="program-card" [class.selected]="programaSelecionado?.id === programa.id"
-          [class.disabled]="emAndamento || pausado" (click)="selecionarPrograma(programa)">
+        <div class="program-card" [class.selected]="programaSelecionado?.id === programa.id" 
+          [class.disabled]="emAndamento || pausado" [class.custom]="programa.customizado" (click)="selecionarPrograma(programa)">
           <div class="program-header">
             <h4>{{ programa.nome }}</h4>
             <span class="program-char">{{ programa.caractereAquecimento }}</span>

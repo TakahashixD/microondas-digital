@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ModalComponent } from '../modal-success/modal.component';
 import { ModalErroComponent } from '../modal-error/modal.component';
 
+
 @Component({
   selector: 'app-microondas',
   templateUrl: './microondas.component.html',

@@ -1,5 +1,31 @@
 [
   {
+    "ContainingType": "microondas_backend.Controllers.AuthController",
+    "Method": "Login",
+    "RelativePath": "api/Auth/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "microondas_backend.DTOs.LoginRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "microondas_backend.DTOs.LoginResponse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
     "ContainingType": "microondas_backend.Controllers.MicroondasController",
     "Method": "AdicionarProgramaCustomizado",
     "RelativePath": "api/Microondas/adicionar",
@@ -9,13 +35,13 @@
     "Parameters": [
       {
         "Name": "programa",
-        "Type": "microondas_backend.Models.ProgramaAquecimento",
+        "Type": "microondas_backend.DTOs.ProgramaAquecimentoDTO",
         "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "microondas_backend.Models.ProgramaAquecimento",
+        "Type": "microondas_backend.DTOs.ProgramaAquecimentoDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -35,13 +61,13 @@
     "Parameters": [
       {
         "Name": "request",
-        "Type": "microondas_backend.Models.MicroondasRequest",
+        "Type": "microondas_backend.DTOs.MicroondasRequest",
         "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "microondas_backend.Models.MicroondasResponse",
+        "Type": "microondas_backend.DTOs.MicroondasResponse",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -61,7 +87,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "microondas_backend.Models.MicroondasResponse",
+        "Type": "microondas_backend.DTOs.MicroondasResponse",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -81,7 +107,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "microondas_backend.Models.MicroondasResponse",
+        "Type": "microondas_backend.DTOs.MicroondasResponse",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -101,7 +127,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.List\u00601[[microondas_backend.Models.ProgramaAquecimento, microondas-backend, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.List\u00601[[microondas_backend.DTOs.ProgramaAquecimentoDTO, microondas-backend, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -127,7 +153,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "microondas_backend.Models.ProgramaAquecimento",
+        "Type": "microondas_backend.DTOs.ProgramaAquecimentoDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -147,7 +173,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "microondas_backend.Models.StatusResponse",
+        "Type": "microondas_backend.DTOs.StatusResponse",
         "MediaTypes": [
           "text/plain",
           "application/json",

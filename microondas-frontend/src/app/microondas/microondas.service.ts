@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AuthService } from '../auth/auth.service';
 
 export interface MicroondasRequest {
   tempo?: number;
@@ -50,8 +51,11 @@ export class MicroondasService {
   private apiUrl = 'https://localhost:7000/api/microondas'; // Ajuste conforme sua API
 
   listProgramaModal = signal<ProgramaAquecimento[]>([]);
+  headers
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthService) { 
+    this.headers =this.authService.getAuthHeaders();
+  }
 
   formatarTempo(tempo: string | undefined): string {
     if(!tempo) return "tempo vazio"
@@ -65,26 +69,26 @@ export class MicroondasService {
   }
 
   getProgramasAquecimento(): Observable<ProgramaAquecimento[]> {
-    return this.http.get<ProgramaAquecimento[]>(`${this.apiUrl}/programas`);
+    return this.http.get<ProgramaAquecimento[]>(`${this.apiUrl}/programas`, {headers: this.headers});
   }
 
   obterStatus(): Observable<StatusResponse> {
-    return this.http.get<StatusResponse>(`${this.apiUrl}/status`);
+    return this.http.get<StatusResponse>(`${this.apiUrl}/status`, {headers: this.headers});
   }
 
   iniciarAquecimento(request: MicroondasRequest): Observable<MicroondasResponse> {
-    return this.http.post<MicroondasResponse>(`${this.apiUrl}/iniciar`, request);
+    return this.http.post<MicroondasResponse>(`${this.apiUrl}/iniciar`, request, {headers: this.headers});
   }
 
   pausarCancelar(): Observable<MicroondasResponse> {
-    return this.http.post<MicroondasResponse>(`${this.apiUrl}/pausar-cancelar`, {});
+    return this.http.post<MicroondasResponse>(`${this.apiUrl}/pausar-cancelar`, null, {headers: this.headers});
   }
 
   inicioRapido(): Observable<MicroondasResponse> {
-    return this.http.post<MicroondasResponse>(`${this.apiUrl}/inicio-rapido`, {});
+    return this.http.post<MicroondasResponse>(`${this.apiUrl}/inicio-rapido`, null, {headers: this.headers});
   }
 
   adicionarProgramasAquecimento(request: ProgramaAquecimento): Observable<ProgramaAquecimento> {
-    return this.http.post<ProgramaAquecimento>(`${this.apiUrl}/adicionar`, request);
+    return this.http.post<ProgramaAquecimento>(`${this.apiUrl}/adicionar`, request, {headers: this.headers});
   }
 }

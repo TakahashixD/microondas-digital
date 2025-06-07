@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("microondas-backend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9c29e0e2619baeb12ac2f8cb20999236e8a59c88")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2eb1ed472cfc399ba61f00efd78f614b5fd4d388")]
 [assembly: System.Reflection.AssemblyProductAttribute("microondas-backend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("microondas-backend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

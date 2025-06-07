@@ -136,3 +136,4 @@ D:\Benner\microondas-backend\microondas-backend\bin\Debug\net8.0\runtimes\win\li
 D:\Benner\microondas-backend\microondas-backend\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 D:\Benner\microondas-backend\microondas-backend\obj\Debug\net8.0\microond.EEF4F048.Up2Date
 D:\Benner\microondas-backend\microondas-backend\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+D:\Benner\microondas-backend\microondas-backend\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

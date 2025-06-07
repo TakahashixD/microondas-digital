@@ -1,11 +1,13 @@
-﻿using microondas_backend.Models;
+﻿using microondas_backend.DTOs;
 using microondas_backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace microondas_backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class MicroondasController : ControllerBase
     {
         private readonly MicroondasService _microondasService;
@@ -16,7 +18,7 @@ namespace microondas_backend.Controllers
         }
 
         [HttpGet("programas")]
-        public ActionResult<List<ProgramaAquecimento>> ObterProgramas()
+        public ActionResult<List<ProgramaAquecimentoDTO>> ObterProgramas()
         {
             try
             {
@@ -30,7 +32,7 @@ namespace microondas_backend.Controllers
         }
 
         [HttpGet("programas/{id}")]
-        public ActionResult<ProgramaAquecimento> ObterPrograma(int id)
+        public ActionResult<ProgramaAquecimentoDTO> ObterPrograma(int id)
         {
             try
             {
@@ -47,7 +49,7 @@ namespace microondas_backend.Controllers
         }
 
         [HttpPost("adicionar")]
-        public ActionResult<ProgramaAquecimento> AdicionarProgramaCustomizado(ProgramaAquecimento programa)
+        public ActionResult<ProgramaAquecimentoDTO> AdicionarProgramaCustomizado(ProgramaAquecimentoDTO programa)
         {
             try
             {

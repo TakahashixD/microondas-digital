@@ -1,4 +1,6 @@
-﻿namespace microondas_backend.Models
+﻿using microondas_backend.Models;
+
+namespace microondas_backend.DTOs
 {
     public class StatusResponse
     {
@@ -9,7 +11,7 @@
         public string StringProcessamento { get; set; } = "";
         public bool Concluido { get; set; }
         public bool ProgramaPreDefinido { get; set; }
-        public ProgramaAquecimento? Programa { get; set; }
+        public ProgramaAquecimentoDTO? Programa { get; set; }
     }
 
 }

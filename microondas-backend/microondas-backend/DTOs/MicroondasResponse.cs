@@ -1,4 +1,6 @@
-﻿namespace microondas_backend.Models
+﻿using microondas_backend.Models;
+
+namespace microondas_backend.DTOs
 {
     public class MicroondasResponse
     {
@@ -11,6 +13,6 @@
         public bool Pausado { get; set; }
         public int TempoRestante { get; set; }
         public bool ProgramaPreDefinido { get; set; }
-        public ProgramaAquecimento? Programa { get; set; }
+        public ProgramaAquecimentoDTO? Programa { get; set; }
     }
 }

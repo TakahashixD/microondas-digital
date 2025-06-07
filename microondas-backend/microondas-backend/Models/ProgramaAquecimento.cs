@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using microondas_backend.DTOs;
+using System.ComponentModel.DataAnnotations;
 
 namespace microondas_backend.Models
 {
@@ -9,11 +10,11 @@ namespace microondas_backend.Models
 
         [Required]
         [MaxLength(50)]
-        public string Nome { get; set; } = string.Empty;
+        public string? Nome { get; set; }
 
         [Required]
         [MaxLength(100)]
-        public string Alimento { get; set; } = string.Empty;
+        public string? Alimento { get; set; }
 
         [Required]
         public int Tempo { get; set; }
@@ -24,11 +25,28 @@ namespace microondas_backend.Models
 
         [Required]
         [MaxLength(1)]
-        public string CaractereAquecimento { get; set; } = string.Empty;
+        public string? CaractereAquecimento { get; set; }
 
+        [Required]
         [MaxLength(500)]
-        public string Instrucoes { get; set; } = string.Empty;
+        public string? Instrucoes { get; set; }
 
         public bool Customizado { get; set; } = false;
+
+        public ProgramaAquecimento(ProgramaAquecimentoDTO programa)
+        {
+            Nome = programa.Nome;
+            Alimento = programa.Alimento;
+            Tempo = programa.Tempo;
+            Potencia = programa.Potencia;
+            CaractereAquecimento = programa.CaractereAquecimento;
+            Instrucoes = programa.Instrucoes;
+            Customizado = programa.Customizado;
+        }
+
+        public ProgramaAquecimento()
+        {
+        }
     }
 }
+

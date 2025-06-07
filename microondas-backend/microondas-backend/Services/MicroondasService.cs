@@ -1,9 +1,8 @@
 ﻿using microondas_backend.Data;
+using microondas_backend.DTOs;
 using microondas_backend.Exceptions;
 using microondas_backend.Models;
-using Microsoft.EntityFrameworkCore;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace microondas_backend.Services
 {
@@ -19,7 +18,7 @@ namespace microondas_backend.Services
         private static Timer? _timer;
         private static string _stringProcessamento = "";
         private static bool _programaPreDefinido = false;
-        private static ProgramaAquecimento? _programaAtual = null;
+        private static ProgramaAquecimentoDTO? _programaAtual = null;
         private static string _caractereAquecimento = ".";
 
         public MicroondasService(DataContext context)
@@ -27,24 +26,27 @@ namespace microondas_backend.Services
             _context = context;
         }
 
-        public List<ProgramaAquecimento> ObterProgramasPreDefinidos()
+        public List<ProgramaAquecimentoDTO> ObterProgramasPreDefinidos()
         {
-            return _context.ProgramasAquecimento.ToList();
+            var programa = _context.ProgramasAquecimento.ToList();
+            return programa.Select(p => new ProgramaAquecimentoDTO(p)).ToList();
         }
 
-        public ProgramaAquecimento? ObterProgramaPorId(int id)
+        public ProgramaAquecimentoDTO ObterProgramaPorId(int id)
         {
-            return _context.ProgramasAquecimento.FirstOrDefault(p => p.Id == id);
+            var programa = _context.ProgramasAquecimento.FirstOrDefault(p => p.Id == id);
+            if (programa == null) throw new MicroondasException("Programa não encontrado");
+            return new ProgramaAquecimentoDTO(programa);
         }
 
-        public void AdicionarProgramaCustomizado(ProgramaAquecimento programa)
+        public void AdicionarProgramaCustomizado(ProgramaAquecimentoDTO programa)
         {
             var programas = _context.ProgramasAquecimento.ToList();
             foreach (ProgramaAquecimento p in programas)
                 if (p.CaractereAquecimento == programa.CaractereAquecimento ||
                     programa.CaractereAquecimento == ".")
                     throw new MicroondasException("Caracter já cadastrado");
-            _context.ProgramasAquecimento.Add(programa);
+            _context.ProgramasAquecimento.Add(new ProgramaAquecimento(programa));
             _context.SaveChanges();
         }
 
