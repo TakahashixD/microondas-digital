@@ -1,0 +1,190 @@
+<div class="microondas-container">
+  <h1>Microondas Digital</h1>
+
+  <!-- Display -->
+  <div class="display">
+    <div class="display-time">
+      @if (emAndamento || pausado) {
+      <span>{{ formatarTempo(tempoRestante.toString()) }}</span>
+      }
+      @if (!emAndamento && !pausado && tempo && !concluido) {
+      <span>{{ formatarTempo(tempo) }}</span>
+      }
+      @if (!emAndamento && !pausado && !tempo && tempoRestante==0 || concluido) {
+      <span>--:--</span>
+      }
+    </div>
+    <div class="display-power">
+      @if (emAndamento || pausado) {
+      <span>Potência: {{ potenciaAtual }}</span>
+      }
+      @if (!emAndamento && !pausado && potencia) {
+      <span>Potência: {{ potencia }}</span>
+      }
+      @if (!emAndamento && !pausado && !potencia) {
+      <span>Potência: 10</span>
+      }
+    </div>
+    <div class="display-status">
+      @if (emAndamento) {
+      <span class="status-running">AQUECENDO</span>
+      }
+      @if (pausado) {
+      <span class="status-paused">PAUSADO</span>
+      }
+      @if (concluido) {
+      <span class="status-completed">CONCLUÍDO</span>
+      }
+    </div>
+
+    <!-- Mostrar programa selecionado -->
+    @if (programaSelecionado && (emAndamento || pausado)) {
+    <div class="display-program">
+      <span>{{ programaSelecionado.nome }}</span>
+    </div>
+    }
+  </div>
+
+  <!-- String de Processamento -->
+  @if (stringProcessamento) {
+  <div class="processing-display">
+    <div class="processing-text">{{ stringProcessamento }}</div>
+  </div>
+  }
+
+  <!-- Mensagens(Erro ou Sucesso) -->
+  @if (mensagem) {
+  <div class="messages">
+    <div class="message">{{ mensagem }}</div>
+  </div>
+  }
+  <br>
+
+
+
+  <div class="options-container">
+    <!-- Seção de Programas Pré-definidos -->
+    <div class="programs-section">
+      <h3>Programas Pré-definidos</h3>
+      <div class="programs-grid">
+        @for (programa of listProgramas; track programa.id) {
+        <div class="program-card" [class.selected]="programaSelecionado?.id === programa.id"
+          [class.disabled]="emAndamento || pausado" (click)="selecionarPrograma(programa)">
+          <div class="program-header">
+            <h4>{{ programa.nome }}</h4>
+            <span class="program-char">{{ programa.caractereAquecimento }}</span>
+          </div>
+          <div class="program-info">
+            <p><strong>Alimento:</strong> {{ programa.alimento }}</p>
+            <p><strong>Tempo:</strong> {{ formatarTempo(programa.tempo.toString()) }}</p>
+            <p><strong>Potência:</strong> {{ programa.potencia }}</p>
+          </div>
+          <div class="program-instructions">
+            <p><strong>Instruções:</strong> {{ programa.instrucoes }}</p>
+          </div>
+        </div>
+        }
+      </div>
+
+      @if (programaSelecionado) {
+      <div class="selected-program-info">
+        <p><strong>Programa selecionado:</strong> {{ programaSelecionado.nome }}</p>
+        <button class="btn-clear-program" (click)="limparPrograma()" [disabled]="emAndamento || pausado">
+          Limpar Seleção
+        </button>
+      </div>
+      }
+    </div>
+
+    <!-- Controles de Input -->
+    <div class="input-section">
+      <div class="input-group">
+        <label>Tempo (segundos):</label>
+        <input type="number" [(ngModel)]="tempo" placeholder="1-120" [disabled]="isControlesDesabilitados()"
+          [readonly]="programaPreDefinido" min="1" max="120">
+        <button (click)="limparTempo()" [disabled]="isControlesDesabilitados()">Limpar</button>
+      </div>
+
+      <div class="input-group">
+        <label>Potência (1-10):</label>
+        <input type="number" [(ngModel)]="potencia" placeholder="1-10" [disabled]="isControlesDesabilitados()"
+          [readonly]="programaPreDefinido" min="1" max="10">
+        <button (click)="limparPotencia()" [disabled]="isControlesDesabilitados()">Limpar</button>
+      </div>
+    </div>
+    <!-- Teclado Digital -->
+    <div class="digital-keyboard">
+      <h3>Teclado Digital</h3>
+
+      <div class="keyboard-section">
+        <h4>Tempo</h4>
+        <div class="keyboard-grid">
+          <button (click)="adicionarDigito('1')" [disabled]="isControlesDesabilitados()">1</button>
+          <button (click)="adicionarDigito('2')" [disabled]="isControlesDesabilitados()">2</button>
+          <button (click)="adicionarDigito('3')" [disabled]="isControlesDesabilitados()">3</button>
+          <button (click)="adicionarDigito('4')" [disabled]="isControlesDesabilitados()">4</button>
+          <button (click)="adicionarDigito('5')" [disabled]="isControlesDesabilitados()">5</button>
+          <button (click)="adicionarDigito('6')" [disabled]="isControlesDesabilitados()">6</button>
+          <button (click)="adicionarDigito('7')" [disabled]="isControlesDesabilitados()">7</button>
+          <button (click)="adicionarDigito('8')" [disabled]="isControlesDesabilitados()">8</button>
+          <button (click)="adicionarDigito('9')" [disabled]="isControlesDesabilitados()">9</button>
+          <button (click)="adicionarDigito('0')" [disabled]="isControlesDesabilitados()">0</button>
+          <button [disabled]="isControlesDesabilitados()"></button>
+          <button (click)="limparTempo()" [disabled]="isControlesDesabilitados()">C</button>
+          <span></span>
+        </div>
+      </div>
+
+      <div class="keyboard-section">
+        <h4>Potência</h4>
+        <div class="keyboard-grid-small">
+          <button (click)="adicionarDigitoPotencia('1')" [disabled]="isControlesDesabilitados()">1</button>
+          <button (click)="adicionarDigitoPotencia('2')" [disabled]="isControlesDesabilitados()">2</button>
+          <button (click)="adicionarDigitoPotencia('3')" [disabled]="isControlesDesabilitados()">3</button>
+          <button (click)="adicionarDigitoPotencia('4')" [disabled]="isControlesDesabilitados()">4</button>
+          <button (click)="adicionarDigitoPotencia('5')" [disabled]="isControlesDesabilitados()">5</button>
+          <button (click)="adicionarDigitoPotencia('6')" [disabled]="isControlesDesabilitados()">6</button>
+          <button (click)="adicionarDigitoPotencia('7')" [disabled]="isControlesDesabilitados()">7</button>
+          <button (click)="adicionarDigitoPotencia('8')" [disabled]="isControlesDesabilitados()">8</button>
+          <button (click)="adicionarDigitoPotencia('9')" [disabled]="isControlesDesabilitados()">9</button>
+          <button (click)="adicionarDigitoPotencia('10')" [disabled]="isControlesDesabilitados()">10</button>
+          <button [disabled]="isControlesDesabilitados()"></button>
+          <button (click)="limparPotencia()" [disabled]="isControlesDesabilitados()">C</button>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botões de Controle -->
+  <div class="control-buttons">
+    <button class="btn-start" (click)="iniciarAquecimento()" [disabled]="emAndamento && programaPreDefinido">
+      {{ getBotaoIniciarTexto() }}
+    </button>
+
+    <button class="btn-quick" (click)="inicioRapido()" [disabled]="isInicioRapidoDesabilitado()">
+      Início Rápido (30s)
+    </button>
+
+    <button class="btn-pause" (click)="pausarCancelar()">
+      {{ getBotaoPausarTexto() }}
+    </button>
+
+      <!-- Botão abrir modal para novo programa-->
+    <button class="btn-add-program" (click)="abrirModalNovoPrograma()" [disabled]="emAndamento || pausado">
+      + Novo Programa
+    </button>
+  </div>
+
+  <app-modal [isVisible]="modalNovoPrograma" [mostrarModalSucesso]="mostrarModalSucesso" (onClose)="fecharModalNovoPrograma()"
+    (onSave)="adicionarNovoPrograma($event)">
+  </app-modal>
+
+  <app-modal-erro 
+  [isVisible]="modalErroVisivel" 
+  [mensagemErro]="mensagemErroAtual"
+  [mostrarBotaoTentarNovamente]="true"
+  (onClose)="fecharModalErro()" 
+  (onRetry)="tentarNovamenteAcao()">
+</app-modal-erro>
+</div>
