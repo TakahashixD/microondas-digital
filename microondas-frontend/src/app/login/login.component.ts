@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { AuthService, LoginRequest } from '../auth/auth.service';
+import { AuthService, LoginRequest, LoginResponse } from '../auth/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -70,9 +70,9 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(loginRequest)
       .subscribe({
-        next: (response) => {
+        next: (res) => {
+          const response: LoginResponse = res;
           this.isLoading = false;
-          
           if (response.sucesso) {
             this.sucessoMenssagem = response.mensagem;
             

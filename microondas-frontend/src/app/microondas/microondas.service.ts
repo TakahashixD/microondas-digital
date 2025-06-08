@@ -48,7 +48,7 @@ export interface ProgramaAquecimento {
   providedIn: 'root'
 })
 export class MicroondasService {
-  private apiUrl = 'https://localhost:7000/api/microondas'; // Ajuste conforme sua API
+  private apiUrl = 'http://localhost:7000/api/microondas'; // Ajuste conforme sua API
 
   listProgramaModal = signal<ProgramaAquecimento[]>([]);
   headers
@@ -69,26 +69,26 @@ export class MicroondasService {
   }
 
   getProgramasAquecimento(): Observable<ProgramaAquecimento[]> {
-    return this.http.get<ProgramaAquecimento[]>(`${this.apiUrl}/programas`, {headers: this.headers});
+    return this.http.get<ProgramaAquecimento[]>(`${this.apiUrl}/programas`);
   }
 
   obterStatus(): Observable<StatusResponse> {
-    return this.http.get<StatusResponse>(`${this.apiUrl}/status`, {headers: this.headers});
+    return this.http.get<StatusResponse>(`${this.apiUrl}/status`);
   }
 
   iniciarAquecimento(request: MicroondasRequest): Observable<MicroondasResponse> {
-    return this.http.post<MicroondasResponse>(`${this.apiUrl}/iniciar`, request, {headers: this.headers});
+    return this.http.post<MicroondasResponse>(`${this.apiUrl}/iniciar`, request);
   }
 
   pausarCancelar(): Observable<MicroondasResponse> {
-    return this.http.post<MicroondasResponse>(`${this.apiUrl}/pausar-cancelar`, null, {headers: this.headers});
+    return this.http.post<MicroondasResponse>(`${this.apiUrl}/pausar-cancelar`, null);
   }
 
   inicioRapido(): Observable<MicroondasResponse> {
-    return this.http.post<MicroondasResponse>(`${this.apiUrl}/inicio-rapido`, null, {headers: this.headers});
+    return this.http.post<MicroondasResponse>(`${this.apiUrl}/inicio-rapido`, null);
   }
 
   adicionarProgramasAquecimento(request: ProgramaAquecimento): Observable<ProgramaAquecimento> {
-    return this.http.post<ProgramaAquecimento>(`${this.apiUrl}/adicionar`, request, {headers: this.headers});
+    return this.http.post<ProgramaAquecimento>(`${this.apiUrl}/adicionar`, request);
   }
 }

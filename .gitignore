@@ -1,0 +1,61 @@
+## Ignore arquivos de build
+bin/
+obj/
+[Bb]uild/
+[Ll]og/
+*.log
+
+## Ignore pacotes do NuGet
+*.nupkg
+packages/
+*.snupkg
+
+## VS user-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## VS Code
+.vscode/
+
+## Backup & arquivos temporários
+*~
+*.tmp
+*.bak
+*.swp
+
+## Arquivos de publicação
+publish/
+*.publish.xml
+
+## Configs locais
+appsettings.*.json
+secrets.json
+*.local.config
+*.config.user
+
+## Arquivos do Rider
+.idea/
+
+## Arquivos do ReSharper
+_ReSharper*/
+*.DotSettings.user
+
+## Arquivos de testes
+TestResults/
+.vs/
+
+## Logs do IIS Express
+/.vs
+*.vspscc
+
+## Arquivos de deploy do Web Deploy
+*.SourceManifest.xml
+*.pubxml
+*.publishproj
+
+## Arquivos gerados por pacotes NuGet restaurados
+project.lock.json
+project.fragment.lock.json
+artifacts/
