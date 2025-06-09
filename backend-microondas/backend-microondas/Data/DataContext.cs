@@ -11,7 +11,7 @@ namespace backend_microondas.Data
             Database.SetInitializer(new CreateDatabaseIfNotExists<DataContext>());
         }
 
-        public DbSet<ProgramaAquecimento> ProgramasAquecimento { get; set; }
+        public virtual DbSet<ProgramaAquecimento> ProgramasAquecimento { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)

@@ -14,6 +14,7 @@ namespace backend_microondas.DTOs
         public string Instrucoes { get; set; }
         public bool Customizado { get; set; }
 
+
         public ProgramaAquecimentoDTO(int id, string nome, string alimento, int tempo, int potencia, string caractereAquecimento, string instrucoes, bool customizado)
         {
             Id = id;
@@ -36,6 +37,10 @@ namespace backend_microondas.DTOs
             CaractereAquecimento = programa.CaractereAquecimento;
             Instrucoes = programa.Instrucoes;
             Customizado = programa.Customizado;
+        }
+
+        public ProgramaAquecimentoDTO()
+        {
         }
     }
 }

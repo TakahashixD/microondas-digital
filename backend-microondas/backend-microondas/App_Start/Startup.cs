@@ -7,11 +7,8 @@ using System.Text;
 using System.Web.Http;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Security;
-using backend_microondas.App_Start;
 
-[assembly: OwinStartup(typeof(backend_microondas.Startup))]
-
-namespace backend_microondas
+namespace backend_microondas.App_Start
 {
     public class Startup
     {

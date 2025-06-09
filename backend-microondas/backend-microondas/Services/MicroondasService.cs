@@ -2,7 +2,9 @@
 using backend_microondas.DTOs;
 using backend_microondas.Exceptions;
 using backend_microondas.Models;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -29,55 +31,179 @@ namespace backend_microondas.Services
             _context = context;
         }
 
-        public List<ProgramaAquecimentoDTO> ObterProgramasPreDefinidos()
+        private void LogException(Exception ex)
         {
-            var programa = _context.ProgramasAquecimento.ToList();
-            return programa.Select(p => new ProgramaAquecimentoDTO(p)).ToList();
+            string logFilePath = "exceptions.log"; // Caminho do arquivo de log
+            var logMessage = new StringBuilder();
+            logMessage.AppendLine($"Data: {DateTime.Now}");
+            logMessage.AppendLine($"Exception: {ex.Message}");
+            logMessage.AppendLine($"Inner Exception: {ex.InnerException?.Message}");
+            logMessage.AppendLine($"Stack Trace: {ex.StackTrace}");
+            logMessage.AppendLine("--------------------------------------------------");
+            File.AppendAllText(logFilePath, logMessage.ToString());
+        }
+
+        public List<ProgramaAquecimentoDTO> ObterProgramas()
+        {
+            try
+            {
+                var programa = _context.ProgramasAquecimento.ToList();
+                if (programa == null) throw new MicroondasException("Erro ao obter programas.");
+                return programa.Select(p => new ProgramaAquecimentoDTO(p)).ToList();
+            }
+            catch (Exception ex)
+            {
+                LogException(ex);
+                throw;
+            }
         }
 
         public ProgramaAquecimentoDTO ObterProgramaPorId(int id)
         {
-            var programa = _context.ProgramasAquecimento.FirstOrDefault(p => p.Id == id);
-            if (programa == null) throw new MicroondasException("Programa não encontrado");
-            return new ProgramaAquecimentoDTO(programa);
+            try
+            {
+                var programa = _context.ProgramasAquecimento.FirstOrDefault(p => p.Id == id);
+                if (programa == null) throw new MicroondasException("Programa não encontrado");
+                return new ProgramaAquecimentoDTO(programa);
+            }
+            catch (Exception ex)
+            {
+                LogException(ex);
+                throw;
+            }
         }
 
         public void AdicionarProgramaCustomizado(ProgramaAquecimentoDTO programa)
         {
-            var programas = _context.ProgramasAquecimento.ToList();
-            foreach (ProgramaAquecimento p in programas)
-                if (p.CaractereAquecimento == programa.CaractereAquecimento ||
-                    programa.CaractereAquecimento == ".")
-                    throw new MicroondasException("Caracter já cadastrado");
-            _context.ProgramasAquecimento.Add(new ProgramaAquecimento(programa));
-            _context.SaveChanges();
+            try
+            {
+                var programas = _context.ProgramasAquecimento.ToList();
+                foreach (ProgramaAquecimento p in programas)
+                    if (p.CaractereAquecimento == programa.CaractereAquecimento ||
+                        programa.CaractereAquecimento == ".")
+                        throw new MicroondasException("Caracter já cadastrado");
+                _context.ProgramasAquecimento.Add(new ProgramaAquecimento(programa));
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                LogException(ex);
+                throw;
+            }
         }
 
         public MicroondasResponse IniciarAquecimento(MicroondasRequest request)
         {
-            var response = new MicroondasResponse();
-
-            // Verificar se é programa
-            if (request.ProgramaId.HasValue)
+                var response = new MicroondasResponse();
+            try
             {
-                var programa = ObterProgramaPorId(request.ProgramaId.Value);
-                if (programa == null)
+
+                // Verificar se é programa
+                if (request.ProgramaId.HasValue)
                 {
-                    response.Sucesso = false;
-                    response.Mensagem = "Programa não encontrado.";
+                    var programa = ObterProgramaPorId(request.ProgramaId.Value);
+                    if (programa == null)
+                    {
+                        response.Sucesso = false;
+                        response.Mensagem = "Programa não encontrado.";
+                        return response;
+                    }
+
+                    // Para programas, não permite adição de tempo se já estiver em andamento
+                    if (_emAndamento && _programa)
+                    {
+                        response.Sucesso = false;
+                        response.Mensagem = "Não é possível adicionar tempo em programas.";
+                        return response;
+                    }
+
+                    // Se pausado e é o mesmo programa, retoma
+                    if (_pausado && _programa && _programaAtual?.Id == programa.Id)
+                    {
+                        _pausado = false;
+                        _emAndamento = true;
+                        IniciarTimer();
+
+                        response.Sucesso = true;
+                        response.Mensagem = "Aquecimento retomado.";
+                        response.EmAndamento = true;
+                        response.TempoRestante = _tempoRestante;
+                        response.ProgramaPreDefinido = true;
+                        response.Programa = programa;
+                        return response;
+                    }
+
+                    // Novo aquecimento com programa
+                    _tempoRestante = programa.Tempo;
+                    _tempoTotalOriginal = programa.Tempo;
+                    _potencia = programa.Potencia;
+                    _programa = true;
+                    _programaAtual = programa;
+                    _caractereAquecimento = programa.CaractereAquecimento;
+                    _emAndamento = true;
+                    _pausado = false;
+                    _stringProcessamento = "";
+
+                    IniciarTimer();
+
+                    response.Sucesso = true;
+                    response.Mensagem = $"Programa {programa.Nome} iniciado.";
+                    response.TempoFinal = programa.Tempo;
+                    response.PotenciaFinal = programa.Potencia;
+                    response.EmAndamento = true;
+                    response.TempoRestante = _tempoRestante;
+                    response.ProgramaPreDefinido = true;
+                    response.Programa = programa;
+
                     return response;
                 }
 
-                // Para programas, não permite adição de tempo se já estiver em andamento
-                if (_emAndamento && _programa)
+                // Lógica original para aquecimento manual
+                _programa = false;
+                _programaAtual = null;
+                _caractereAquecimento = ".";
+
+                // Início rápido - sem tempo nem potência
+                if (!request.Tempo.HasValue && !request.Potencia.HasValue)
+                {
+                    request.Tempo = 30;
+                    request.Potencia = 10;
+                }
+
+                // Validação de tempo
+                int tempo = request.Tempo ?? 30;
+                if (tempo < 1 || tempo > 120)
                 {
                     response.Sucesso = false;
-                    response.Mensagem = "Não é possível adicionar tempo em programas.";
+                    response.Mensagem = "Tempo deve estar entre 1 segundo e 2 minutos (120 segundos).";
                     return response;
                 }
 
-                // Se pausado e é o mesmo programa, retoma
-                if (_pausado && _programa && _programaAtual?.Id == programa.Id)
+                // Validação de potência
+                int potencia = request.Potencia ?? 10;
+                if (potencia < 1 || potencia > 10)
+                {
+                    response.Sucesso = false;
+                    response.Mensagem = "Potência deve estar entre 1 e 10.";
+                    return response;
+                }
+
+                // Se já está em andamento (modo manual), adiciona 30 segundos
+                if (_emAndamento && !_programa && !_pausado)
+                {
+                    _tempoRestante += 30;
+                    if (_tempoRestante > 120)
+                        _tempoRestante = 120;
+
+                    response.Sucesso = true;
+                    response.Mensagem = "30 segundos adicionados ao aquecimento.";
+                    response.TempoRestante = _tempoRestante;
+                    response.EmAndamento = true;
+                    return response;
+                }
+
+                // Se pausado (modo manual), retoma o aquecimento
+                if (_pausado && !_programa)
                 {
                     _pausado = false;
                     _emAndamento = true;
@@ -87,18 +213,13 @@ namespace backend_microondas.Services
                     response.Mensagem = "Aquecimento retomado.";
                     response.EmAndamento = true;
                     response.TempoRestante = _tempoRestante;
-                    response.ProgramaPreDefinido = true;
-                    response.Programa = programa;
                     return response;
                 }
 
-                // Novo aquecimento com programa
-                _tempoRestante = programa.Tempo;
-                _tempoTotalOriginal = programa.Tempo;
-                _potencia = programa.Potencia;
-                _programa = true;
-                _programaAtual = programa;
-                _caractereAquecimento = programa.CaractereAquecimento;
+                // Novo aquecimento manual
+                _tempoRestante = tempo;
+                _tempoTotalOriginal = tempo;
+                _potencia = potencia;
                 _emAndamento = true;
                 _pausado = false;
                 _stringProcessamento = "";
@@ -106,134 +227,73 @@ namespace backend_microondas.Services
                 IniciarTimer();
 
                 response.Sucesso = true;
-                response.Mensagem = $"Programa {programa.Nome} iniciado.";
-                response.TempoFinal = programa.Tempo;
-                response.PotenciaFinal = programa.Potencia;
+                response.Mensagem = "Aquecimento iniciado.";
+                response.TempoFinal = tempo;
+                response.PotenciaFinal = potencia;
                 response.EmAndamento = true;
                 response.TempoRestante = _tempoRestante;
-                response.ProgramaPreDefinido = true;
-                response.Programa = programa;
 
                 return response;
             }
-
-            // Lógica original para aquecimento manual
-            _programa = false;
-            _programaAtual = null;
-            _caractereAquecimento = ".";
-
-            // Início rápido - sem tempo nem potência
-            if (!request.Tempo.HasValue && !request.Potencia.HasValue)
+            catch (MicroondasException)
             {
-                request.Tempo = 30;
-                request.Potencia = 10;
+                throw;
+            }
+            catch (Exception ex)
+            {
+                LogException(ex);
+                throw;
             }
 
-            // Validação de tempo
-            int tempo = request.Tempo ?? 30;
-            if (tempo < 1 || tempo > 120)
-            {
-                response.Sucesso = false;
-                response.Mensagem = "Tempo deve estar entre 1 segundo e 2 minutos (120 segundos).";
-                return response;
-            }
-
-            // Validação de potência
-            int potencia = request.Potencia ?? 10;
-            if (potencia < 1 || potencia > 10)
-            {
-                response.Sucesso = false;
-                response.Mensagem = "Potência deve estar entre 1 e 10.";
-                return response;
-            }
-
-            // Se já está em andamento (modo manual), adiciona 30 segundos
-            if (_emAndamento && !_programa && !_pausado)
-            {
-                _tempoRestante += 30;
-                if (_tempoRestante > 120)
-                    _tempoRestante = 120;
-
-                response.Sucesso = true;
-                response.Mensagem = "30 segundos adicionados ao aquecimento.";
-                response.TempoRestante = _tempoRestante;
-                response.EmAndamento = true;
-                return response;
-            }
-
-            // Se pausado (modo manual), retoma o aquecimento
-            if (_pausado && !_programa)
-            {
-                _pausado = false;
-                _emAndamento = true;
-                IniciarTimer();
-
-                response.Sucesso = true;
-                response.Mensagem = "Aquecimento retomado.";
-                response.EmAndamento = true;
-                response.TempoRestante = _tempoRestante;
-                return response;
-            }
-
-            // Novo aquecimento manual
-            _tempoRestante = tempo;
-            _tempoTotalOriginal = tempo;
-            _potencia = potencia;
-            _emAndamento = true;
-            _pausado = false;
-            _stringProcessamento = "";
-
-            IniciarTimer();
-
-            response.Sucesso = true;
-            response.Mensagem = "Aquecimento iniciado.";
-            response.TempoFinal = tempo;
-            response.PotenciaFinal = potencia;
-            response.EmAndamento = true;
-            response.TempoRestante = _tempoRestante;
-
-            return response;
         }
 
         public MicroondasResponse PausarCancelar()
         {
             var response = new MicroondasResponse();
 
-            // Se não está em andamento nem pausado, limpa as informações
-            if (!_emAndamento && !_pausado)
+            try
             {
-                LimparInformacoes();
-                response.Sucesso = true;
-                response.Mensagem = "Informações limpas.";
+                // Se não está em andamento nem pausado, limpa as informações
+                if (!_emAndamento && !_pausado)
+                {
+                    LimparInformacoes();
+                    response.Sucesso = true;
+                    response.Mensagem = "Informações limpas.";
+                    return response;
+                }
+
+                // Se está em andamento, pausa
+                if (_emAndamento && !_pausado)
+                {
+                    _pausado = true;
+                    _emAndamento = false;
+                    _timer?.Dispose();
+
+                    response.Sucesso = true;
+                    response.Mensagem = "Aquecimento pausado.";
+                    response.Pausado = true;
+                    response.TempoRestante = _tempoRestante;
+                    response.ProgramaPreDefinido = _programa;
+                    response.Programa = _programaAtual;
+                    return response;
+                }
+
+                // Se está pausado, cancela
+                if (_pausado)
+                {
+                    LimparInformacoes();
+                    response.Sucesso = true;
+                    response.Mensagem = "Aquecimento cancelado.";
+                    return response;
+                }
+
                 return response;
             }
-
-            // Se está em andamento, pausa
-            if (_emAndamento && !_pausado)
+            catch(Exception ex) 
             {
-                _pausado = true;
-                _emAndamento = false;
-                _timer?.Dispose();
-
-                response.Sucesso = true;
-                response.Mensagem = "Aquecimento pausado.";
-                response.Pausado = true;
-                response.TempoRestante = _tempoRestante;
-                response.ProgramaPreDefinido = _programa;
-                response.Programa = _programaAtual;
-                return response;
+                LogException(ex);
+                throw;
             }
-
-            // Se está pausado, cancela
-            if (_pausado)
-            {
-                LimparInformacoes();
-                response.Sucesso = true;
-                response.Mensagem = "Aquecimento cancelado.";
-                return response;
-            }
-
-            return response;
         }
 
         public StatusResponse ObterStatus()

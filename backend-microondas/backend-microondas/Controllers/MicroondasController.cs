@@ -22,7 +22,7 @@ namespace backend_microondas.Controllers
         {
             try
             {
-                var programas = _microondasService.ObterProgramasPreDefinidos();
+                var programas = _microondasService.ObterProgramas();
                 return Ok(programas);
             }
             catch (Exception ex)
